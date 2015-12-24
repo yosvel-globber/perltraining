@@ -32,29 +32,55 @@ use Data::Dumper;
 
 #uniform cost variation ( all path cost 1 ).
 sub dijktra {
-	my (%params)    = @_;
-    #my @graph 	    = $params{'graph'};
-    #my $origin 	    = $params{'origin'};
-    #my $destination = $params{'destination'};
+    #print "\n\n---- INSIDE DIJKTRA ----\n";
 
-    #my @vertexs;        #list of vertex
-    #my %distance;       #distance from source to  to each vertex.
-    #my %previous;       #previous node in optimal path.
+    my (%params)    = @_;
+
+    #this is a tricky and headache prone line for newbies... as the matter of fact: what was really passed in this 
+    #hash value was a reference to an array (inside a hash) created in the call to dijktra, so to get the real
+    #array I had to de-reference the hash value in here in a list context. 
+    my @graph 	    = @{ $params{'graph'} };
+    
+    my $origin 	    = $params{'origin'};
+    my $destination = $params{'destination'};
+
+    my @vertexs;        #list of vertex
+    my %distance;       #distance from source to  to each vertex.
+    my %previous;       #previous node in optimal path.
+
+    #print Dumper(@graph);
+    #print Dumper($origin);
+    #print Dumper($destination);
 
     #dumping ....
-    print Dumper(@_);
+    #print Dumper(%params);
     #the process subroutines...
-=pod
-    for my $edge (0..@graph) {
-        say "edge value  = $edge";
+    for my $idx (0..$#graph) {
         
-        my($v1, $v2) = @{ $graph[$edge] };
+        #Again here as this is a nested array reference there is mandatory de-reference the value in $edge.
+        my @edge = @{ $graph[$idx] };
         
-        #dumping ...
-        say "edge $edge: $v1 -> $v2\n";
-        #end dumping ...
+        for my $v (@edge) {
+            my %hystack = map { $_ => 1 } @vertexs;
+            
+            if(!exists($hystack{$v})) {
+                $hystack{$v} = 1;
+                @vertexs = keys %hystack;
+                $distance{$v} = -1;
+                $previous{$v} = -1;
+            }
+        }
     }
-=cut
+
+    print "dijktra: vertex list!\n";
+    print @vertexs;
+    print "\n";
+    print "dijktra: distance list\n";
+    print %distance;
+    print "\n";
+    print "dijktra: previous list\n";
+    print %previous;
+    print "\n";
 }
 
 my @graph;
@@ -82,12 +108,10 @@ while($line = <$fh>) {
 for my $edge (0..$#graph) {
 
 	my ($s, $e) = @{ $graph[$edge] };
-	print "\t$s => $e\n";
+	print "\t$s => $e pointed by $graph[$edge]\n";
 
 }
 
-my (%params) = [ 'graph' => \@graph, 'origin' => $orig, 'destination' => $dest ];
+dijktra(( 'graph' => \@graph, 'origin' => $orig, 'destination' => $dest ));
 
-dijktra(%params);
-
-say "done!...";
+say "\ndone!...";
