@@ -32,18 +32,19 @@ use Data::Dumper;
 
 #uniform cost variation ( all path cost 1 ).
 sub dijktra {
-	my (%params) 	= @_;
-	my @graph 	    = $params{'graph'};
-	my $origin 	    = $params{'origin'};
-    my $destination = $params{'destination'};
+	my (%params)    = @_;
+    #my @graph 	    = $params{'graph'};
+    #my $origin 	    = $params{'origin'};
+    #my $destination = $params{'destination'};
 
-    my @vertexs;        #list of vertex
-    my %distance;       #distance from source to  to each vertex.
-    my %previous;       #previous node in optimal path.
+    #my @vertexs;        #list of vertex
+    #my %distance;       #distance from source to  to each vertex.
+    #my %previous;       #previous node in optimal path.
 
     #dumping ....
-    print Dumper(%params);
-    
+    print Dumper(@_);
+    #the process subroutines...
+=pod
     for my $edge (0..@graph) {
         say "edge value  = $edge";
         
@@ -53,6 +54,7 @@ sub dijktra {
         say "edge $edge: $v1 -> $v2\n";
         #end dumping ...
     }
+=cut
 }
 
 my @graph;
@@ -69,10 +71,6 @@ my ($orig, $dest) = split(" ", $line);
 say "printing: origin -> $orig\n";
 say "printing: destination -> $dest\n";
 
-#dumping ...
-say "-" x 80;
-#end dumping 
-#
 while($line = <$fh>) {
 	chomp($line);
     last if !$line;
@@ -80,8 +78,6 @@ while($line = <$fh>) {
 	$graph[scalar(@graph)] = [ $v1, $v2 ];
 }
 
-#dumping ...
-say "printing: the graph\n";
 
 for my $edge (0..$#graph) {
 
@@ -89,13 +85,9 @@ for my $edge (0..$#graph) {
 	print "\t$s => $e\n";
 
 }
-say "-" x 80;
-#end dumping ...
 
-dijktra({'graph' =>  [ @graph ], 'origin' => $orig, 'destination' => $dest });
+my (%params) = [ 'graph' => \@graph, 'origin' => $orig, 'destination' => $dest ];
 
-#dumping ...
-say "-" x 80 . "\n";
-#end dumping ...
+dijktra(%params);
 
 say "done!...";
