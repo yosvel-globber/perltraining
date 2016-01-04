@@ -7,11 +7,11 @@ use Data::Dumper;
 sub new {
     my $invocant =  shift;
     my $self = bless({}, ref $invocant || $invocant);
-    my %values = @_;
+    my %params = @_;
 
-    $self->{x} =  $values{x};
-    $self->{y} =  $values{y}; 
-    
+    $self->{'x'} =  $params{'x'};
+    $self->{'y'} =  $params{'y'};
+
     return $self;
 }
 
@@ -22,9 +22,10 @@ sub distance {
 
     my $self = shift;
     my (%params) = @_;
-    my $foreignPoint = $params{point};
+    my $foreignPoint = $params{'point'};
 
-    my $d = sqrt(($foreignPoint->{x} - $self->{x})**2 + ($foreignPoint->{y} - $self->{x})**2);
+    my $d = sqrt(($foreignPoint->{'x'} - $self->{'x'})**2 + ($foreignPoint->{'y'} - $self->{'y'})**2);
+
     return $d;
 }
 
