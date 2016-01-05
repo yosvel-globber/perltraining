@@ -2,34 +2,34 @@
 use v5.18;
 use strict;
 use warnings;
+use Shape;
 use Circle;
 use Rectangle;
 use Square;
 use Triangle;
 use Data::Dumper;
+use DBI;
 
 my $command = shift @ARGV;
 my @points;
 my $f;
 my $created = 0;
+my $dbh = DBI->connect("DBI:mysql:database=ex7;host=localhost", 'root', '', { 'RaiseError' => 1, 'AutoCommit' => 0 });
 
-print Dumper $command;
+unless ($command eq 'list') {
+    #parse the points...
+    while(my $arg = shift @ARGV){
+        my ($x, $y) = split(",", $arg);
 
-#parse the points...
-while(my $arg = shift @ARGV){
-    my ($x, $y) = split(",", $arg);
+        if($x > 300 || $y > 300){
+            die "allowed grid is 300x300 so x and y both must be lower than 300";
+        }
 
-    if($x > 300 || $y > 300){
-        die "allowed grid is 300x300 so x and y both must be lower than 300";
+        my $point = Point::->new('x' => $x, 'y' => $y);
+        $points[scalar @points] = $point;
+
     }
-
-    my $point = Point::->new('x' => $x, 'y' => $y);
-    $points[scalar @points] = $point;
-
 }
-
-print Dumper @points;
-print Dumper scalar @points;
 
 #main logic...
 given($command){
@@ -38,7 +38,8 @@ given($command){
             die "to create a circle you must supply the center and the radius\n";
         }
 
-        $f = Circle::->new(('center' => $points[0], 'point' => $points[1]));
+        $f = Circle::->new(('p1' => $points[0], 'p2' => $points[1]));
+        $f->save(('dbh' => $dbh));
         $created = 1;
     }
     when('rectangle') {
@@ -47,6 +48,7 @@ given($command){
         }
 
         $f = Rectangle::->new(('p1' => $points[0], 'p2' => $points[1], 'p3' => $points[2], 'p4' => $points[3]));
+        $f->save(('dbh' => $dbh));
         $created = 1;
     }
     when('triangle') {
@@ -55,6 +57,7 @@ given($command){
         }
 
         $f = Triangle::->new(('p1' => $points[0], 'p2' => $points[1], 'p3' => $points[2]));
+        $f->save(('dbh' => $dbh));
         $created = 1;
     }
     when('square') {
@@ -63,7 +66,42 @@ given($command){
         }
 
         $f = Square::->new(('p1' => $points[0], 'p2' => $points[1], 'p3' => $points[2], 'p4' => $points[3]));
+        $f->save(('dbh' => $dbh));
         $created = 1;
+    }
+    when('list') {
+        my $stmt    = $dbh->prepare("SELECT * FROM figure");
+        my $stmt2   = $dbh->prepare("SELECT * FROM point WHERE id_figure=?");
+        $stmt->execute();
+        while( my $row = $stmt->fetchrow_hashref()) {
+            my %h = %{ $row };
+            $stmt2->execute($h{'id'});
+            my %points;
+
+            my $i = 1; #TODO: finish the point collection and jump into figure creation...
+            while(my $prow = $stmt2->fetchrow_hashref()) {
+                my %h2 = %{ $prow };
+                $
+            }
+
+            given($h{'type'}) {
+                when('Circle') {
+
+                }
+                when('Rectangle') {
+
+                }
+                when('Square') {
+
+                }
+                when('Triangle') {
+
+                }
+                default{
+                    die "Unregistered figure type, do not know how to handle a $h{'type'}\n";
+                }
+            }
+        }
     }
     default {
         print "Usage:\n";
@@ -77,3 +115,5 @@ given($command){
 if($created){
     $f->draw();
 }
+
+$dbh->disconnect();

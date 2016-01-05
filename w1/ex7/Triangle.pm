@@ -18,20 +18,18 @@ sub new {
         die "Check parameters passed to Triangle::new, they must be references to Point\n";
     }
 
+    $self->SUPER::new(@_);
+    $self->{'color'} = "black";
     #todo check it it is a triangle... will make some assumptions here as time is against me!
-
-    $self->{'a'} = $params{'p1'};
-    $self->{'b'} = $params{'p2'};
-    $self->{'c'} = $params{'p3'};
 
     return $self;
 }
 
 sub area {
     my $self = shift;
-    my $s1 = $self->{'a'}->distance("point" => $self->{'b'});
-    my $s2 = $self->{'b'}->distance("point" => $self->{'c'});
-    my $s3 = $self->{'c'}->distance("point" => $self->{'a'});
+    my $s1 = $self->{'points'}->[0]->distance("point" => $self->{'points'}->[1]);
+    my $s2 = $self->{'points'}->[1]->distance("point" => $self->{'points'}->[2]);
+    my $s3 = $self->{'points'}->[2]->distance("point" => $self->{'points'}->[0]);
 
     #perimeter / 2
     my $s = ($s1 + $s2 + $s3) / 2;
@@ -47,14 +45,14 @@ sub draw {
     my $area = $self->area();
 
     my $img = GD::Simple::->new(400, 400);
-    $img->bgcolor('black');
-    $img->fgcolor('black');
+    $img->bgcolor($self->{'color'});
+    $img->fgcolor($self->{'color'});
 
     #draw the triangle...
     my $poly = GD::Polygon::->new();
-    $poly->addPt($self->{'a'}->{'x'}, $self->{'a'}->{'y'});
-    $poly->addPt($self->{'b'}->{'x'}, $self->{'b'}->{'y'});
-    $poly->addPt($self->{'c'}->{'x'}, $self->{'c'}->{'y'});
+    $poly->addPt($self->{'points'}->[0]->{'x'}, $self->{'points'}->[0]->{'y'});
+    $poly->addPt($self->{'points'}->[1]->{'x'}, $self->{'points'}->[1]->{'y'});
+    $poly->addPt($self->{'points'}->[2]->{'x'}, $self->{'points'}->[2]->{'y'});
     $img->penSize(1,1);
     $img->polygon($poly);
 
