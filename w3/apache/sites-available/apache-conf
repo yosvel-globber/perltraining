@@ -1,0 +1,17 @@
+<VirtualHost *:80>
+    ServerName      rest.localhost
+    DocumentRoot    /home/yosvelreyes/Projects/perltraining/globant-training/w3/server
+
+    PerlOptions +Clone +InheritSwitches +Autoload
+    PerlSwitches -Mlib=/home/yosvelreyes/Projects/perltraining/globant-training/w3/server
+    PerlModule  WsHandler
+
+    <location />
+        SetHandler modperl
+        PerlResponseHandler WsHandler
+    </location>
+
+    ErrorLog /home/yosvelreyes/Projects/perltraining/globant-training/w3/server/apache.log
+    LogLevel warn
+    CustomLog /var/log/apache2/access.log combined
+</VirtualHost>
