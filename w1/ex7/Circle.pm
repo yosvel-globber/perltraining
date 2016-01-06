@@ -19,8 +19,7 @@ sub new {
     }
 
     $self->SUPER::new(@_);
-
-    $self->{'radius'}   = $self->{'points'}->[0]->distance('point' => $self->{'points'}->[1]);
+    $self->init();
     $self->{'color'}    = "red";
 
     if(0 == $self->{'radius'}) {
@@ -28,6 +27,11 @@ sub new {
     }
 
     return $self;
+}
+
+sub init {
+    my $self = shift;
+    $self->{'radius'}   = $self->{'points'}->[0]->distance('point' => $self->{'points'}->[1]);
 }
 
 sub draw {
@@ -64,16 +68,6 @@ sub area {
     my $self = shift;
     my $area = PI * ($self->{'radius'}**2);
     return $area;
-}
-
-sub load {
-    my %params = @_;
-    my $dbh = $params{'dbh'};
-    my $id  = $params{'id'};
-
-
-
-
 }
 
 for my $field (qw(center point)) {

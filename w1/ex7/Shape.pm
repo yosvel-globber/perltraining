@@ -4,10 +4,11 @@ use strict;
 use warnings;
 use Data::Dumper;
 use Scalar::Util "blessed";
+use Point;
 
 sub draw{ print "a generic shape can not be drawn \n"; };
 sub area{ print "a generic shape does not have area\n"; };
-sub load{ print "can not load a generic chape\n"; }
+sub init{};
 
 sub new {
     my $self = shift;
@@ -51,6 +52,45 @@ sub save {
         $sth->execute($self->{'id'}, $point->{'x'}, $point->{'y'});
         $dbh->commit();
     }
+}
+
+
+sub load {
+        my $self    = shift;
+        my %params  = @_;
+        my $dbh     = $params{'dbh'};
+        my $id      = $params{'id'};
+        my $class   = blessed $self;
+        my $ret     = 0;
+        my $stmt    = $dbh->prepare("SELECT * FROM figure WHERE id=?");
+
+        $stmt->execute($id);
+
+        if(my $h = $stmt->fetchrow_hashref()) {
+            my %row = %{$h};
+            $self->{'id'}   = $row{'id'};
+            $self->{'type'} = $row{'type'};
+            $self->{'color'} = $row{'color'};
+
+            my $stmt2 = $dbh->prepare("SELECT * FROM point WHERE id_figure=?");
+            $stmt2->execute($id);
+
+            my @points;
+            while(my $hp = $stmt2->fetchrow_hashref()) {
+                my %p = %{$hp};
+                my $pt = Point::->new('x' => $p{'x'}, 'y' => $p{'y'});
+                $points[scalar @points] = $pt;
+            }
+
+            $self->{'points'} = \@points;
+            $ret = 1;
+
+            $self->init();
+        }
+
+        print "load called sucessfully for class $class with id $params{'id'}\n";
+
+        return $ret;
 }
 
 1;

@@ -70,36 +70,15 @@ given($command){
         $created = 1;
     }
     when('list') {
-        my $stmt    = $dbh->prepare("SELECT * FROM figure");
-        my $stmt2   = $dbh->prepare("SELECT * FROM point WHERE id_figure=?");
+        my $stmt    = $dbh->prepare("SELECT id, type FROM figure");
         $stmt->execute();
+
         while( my $row = $stmt->fetchrow_hashref()) {
             my %h = %{ $row };
-            $stmt2->execute($h{'id'});
-            my %points;
-
-            my $i = 1; #TODO: finish the point collection and jump into figure creation...
-            while(my $prow = $stmt2->fetchrow_hashref()) {
-                my %h2 = %{ $prow };
-                $
-            }
-
-            given($h{'type'}) {
-                when('Circle') {
-
-                }
-                when('Rectangle') {
-
-                }
-                when('Square') {
-
-                }
-                when('Triangle') {
-
-                }
-                default{
-                    die "Unregistered figure type, do not know how to handle a $h{'type'}\n";
-                }
+            my $s = bless({}, $h{'type'});
+            if($s->load('dbh' => $dbh, 'id' => $h{'id'})){
+                $s->draw();
+                $s->area();
             }
         }
     }
