@@ -17,20 +17,16 @@ sub new {
         die "Check parameters passed to Rectangle::new, they must be references to Point\n";
     }
 
+    $self->SUPER::new(@_);
     #todo check it it is a rectangle... will make some assumptions here as time is against me!
-
-    $self->{'a'} = $params{'p1'};
-    $self->{'b'} = $params{'p2'};
-    $self->{'c'} = $params{'p3'};
-    $self->{'d'} = $params{'p4'};
-
+    $self->{'color'} = "blue";
     return $self;
 }
 
 sub area {
     my $self = shift;
-    my $a = $self->{'a'}->distance("point" => $self->{'b'});
-    my $b = $self->{'b'}->distance("point" => $self->{'c'});
+    my $a = $self->{'points'}->[0]->distance("point" => $self->{'points'}->[1]);
+    my $b = $self->{'points'}->[1]->distance("point" => $self->{'points'}->[2]);
 
     my $area = $a * $b;
 
@@ -42,11 +38,14 @@ sub draw {
     my $area = $self->area();
 
     my $img = GD::Simple::->new(400, 400);
-    $img->bgcolor('blue');
-    $img->fgcolor('blue');
+    $img->bgcolor($self->{'color'});
+    $img->fgcolor($self->{'color'});
+
+    my $a = $self->{'points'}->[0];
+    my $c = $self->{'points'}->[2];
 
     #draw the rectangle...
-    $img->rectangle($self->{'a'}->{'x'}, $self->{'a'}->{'y'}, $self->{'c'}->{'x'}, $self->{'c'}->{'y'});
+    $img->rectangle($a->{'x'}, $a->{'y'}, $c->{'x'}, $c->{'y'});
 
     #draw the text...
     $img->moveTo(50, 300);
@@ -61,9 +60,6 @@ sub draw {
 
     print "rectangle image writen to ${filename}\n";
 }
-
-
-
 
 for my $field (qw(center point)) {
     my $slot = __PACKAGE__ . "::$field";
