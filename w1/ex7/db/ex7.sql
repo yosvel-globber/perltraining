@@ -32,7 +32,7 @@ DROP TABLE IF EXISTS `figure`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `figure` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `type` int(11) NOT NULL,
+  `type` varchar(45) NOT NULL,
   `color` varchar(45) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
